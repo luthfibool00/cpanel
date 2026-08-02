@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberViolet - Profile & Products</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variabel Warna */
+        :root {
+            --neon-pink: #ff2d95;
+            --neon-purple: #8a2be2;
+            --deep-purple: #6a0dad;
+            --dark-bg: #0a0a16;
+            --darker-bg: #070710;
+            --medium-bg: #131325;
+            --text-color: #f1f1f1;
+            --text-muted: #a9a9c5;
+            --accent-blue: #00ccff;
+            --telegram-blue: #0088cc;
+            --card-bg: rgba(26, 26, 46, 0.6);
+        }
+
+        /* Reset & Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: var(--darker-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(138, 43, 226, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 75%, rgba(255, 45, 149, 0.15) 0%, transparent 25%),
+                linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Glow Effect */
+        .glow {
+            text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+        }
+
+        .glow-purple {
+            text-shadow: 0 0 5px var(--neon-purple), 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--neon-pink), var(--neon-purple));
+            border-radius: 10px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(10, 10, 22, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.1rem;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--neon-pink), var(--neon-purple));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-pink);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 45, 149, 0.2) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 650px;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--neon-pink), var(--accent-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            animation: gradientShift 5s ease infinite;
+            background-size: 200% auto;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 45, 149, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-size: 1.1rem;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 45, 149, 0.6);
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        .btn-telegram {
+            background: linear-gradient(45deg, var(--telegram-blue), var(--accent-blue));
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
+        }
+
+        .btn-telegram::before {
+            background: linear-gradient(45deg, var(--accent-blue), var(--telegram-blue));
+        }
+
+        .btn-telegram:hover {
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.6);
+        }
+
+        /* About Section */
+        .about {
+            padding: 7rem 10%;
+            background-color: var(--dark-bg);
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 4rem;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--neon-pink), var(--neon-purple));
+            border-radius: 2px;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 5rem;
+        }
+
+        .about-img {
+            flex: 1;
+            position: relative;
+        }
+
+        .about-img::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--neon-pink);
+            border-radius: 15px;
+            top: 15px;
+            left: 15px;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .about-img img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 45, 149, 0.3);
+            transition: transform 0.5s ease;
+        }
+
+        .about-img:hover img {
+            transform: scale(1.03);
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text h3 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--neon-pink);
+        }
+
+        .about-text p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* Products Section */
+        .products {
+            padding: 7rem 10%;
+            background-color: var(--darker-bg);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255, 45, 149, 0.1), rgba(138, 43, 226, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .product-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 15px 35px rgba(255, 45, 149, 0.25);
+            border: 1px solid var(--neon-pink);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-img {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .product-img img {
+            transform: scale(1.1);
+        }
+
+        .product-info {
+            padding: 1.8rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .product-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--neon-purple);
+        }
+
+        .product-info p {
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            font-size: 1rem;
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+            display: block;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Telegram Section */
+        .telegram {
+            padding: 7rem 10%;
+            background-color: var(--dark-bg);
+            text-align: center;
+            position: relative;
+        }
+
+        .telegram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 75% 25%, rgba(0, 136, 204, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 25% 75%, rgba(0, 204, 255, 0.1) 0%, transparent 30%);
+            z-index: 0;
+        }
+
+        .telegram-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .telegram-info {
+            margin-bottom: 4rem;
+        }
+
+        .telegram-info h3 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--neon-pink);
+        }
+
+        .telegram-info p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .telegram-cards {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .telegram-card {
+            background: rgba(26, 26, 46, 0.7);
+            border: 1px solid var(--telegram-blue);
+            border-radius: 15px;
+            padding: 2.5rem;
+            width: 320px;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.2);
+        }
+
+        .telegram-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 136, 204, 0.3);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .telegram-card i {
+            font-size: 3.5rem;
+            color: var(--telegram-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .telegram-card h4 {
+            font-size: 1.7rem;
+            margin-bottom: 1.2rem;
+            color: var(--accent-blue);
+        }
+
+        .telegram-card p {
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 10%;
+            text-align: center;
+            background-color: var(--darker-bg);
+            border-top: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        footer p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        footer a {
+            color: var(--telegram-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--accent-blue);
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .about-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .telegram-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .about-text h3 {
+                font-size: 1.8rem;
+            }
+            
+            .telegram-card {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .hero, .about, .products, .telegram {
+                padding: 5rem 7%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .btn {
+                padding: 0.9rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero, .about, .products, .telegram {
+                padding: 4rem 5%;
+            }
+            
+            .logo {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <nav>
+            <div class="logo">Cyber<span class="glow">Violet</span></div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#about">Tentang</a>
+                <a href="#products">Produk</a>
+                <a href="#telegram">Telegram</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Ungu Pink Cyber Style Modern</h1>
+            <p>Temukan koleksi produk terbaru dengan tema cyber futuristik yang modern dan elegan. Ekspresikan gaya unikmu dengan sentuhan neon yang memukau.</p>
+            <div class="hero-buttons">
+                <a href="#products" class="btn">Jelajahi Produk</a>
+                <a href="#telegram" class="btn btn-telegram">Hubungi via Telegram</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <h2 class="section-title">Tentang Saya</h2>
+        <div class="about-content">
+            <div class="about-img">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=700&q=80" alt="Profile Image">
+            </div>
+            <div class="about-text">
+                <h3>Cyber Enthusiast & Fashion Designer</h3>
+                <p>Hai! Saya seorang desainer yang terinspirasi oleh estetika cyberpunk dan futuristik. Saya menggabungkan elemen-elemen modern dengan sentuhan neon yang mencolok untuk menciptakan produk yang unik dan stylish.</p>
+                <p>Dengan passion di dunia fashion dan teknologi, saya berusaha menciptakan produk yang tidak hanya terlihat bagus tetapi juga merepresentasikan gaya hidup modern dan berani.</p>
+                <a href="#telegram" class="btn btn-telegram">Hubungi via Telegram</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products" id="products">
+        <h2 class="section-title">Koleksi Produk</h2>
+        <div class="products-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=700&q=80" alt="Cyber T-Shirt">
+                </div>
+                <div class="product-info">
+                    <h3>Neon Cyber T-Shirt</h3>
+                    <p>Kaos dengan desain cyberpunk dan detail neon glow.</p>
+                    <span class="product-price">Rp 299.000</span>
+                    <a href="#telegram" class="btn btn-telegram">Beli via Telegram</a>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=700&q=80" alt="Holographic Sneakers">
+                </div>
+                <div class="product-info">
+                    <h3>Holographic Sneakers</h3>
+                    <p>Sepatu dengan efek hologram dan detail reflective.</p>
+                    <span class="product-price">Rp 899.000</span>
+                    <a href="#telegram" class="btn btn-telegram">Beli via Telegram</a>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1604671805232-344e3c3c2b45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=700&q=80" alt="LED Accessories">
+                </div>
+                <div class="product-info">
+                    <h3>LED Accessories Set</h3>
+                    <p>Aksesoris dengan LED built-in untuk tampilan cyber yang maksimal.</p>
+                    <span class="product-price">Rp 459.000</span>
+                    <a href="#telegram" class="btn btn-telegram">Beli via Telegram</a>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1588175996413-f5e7a854fd26?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=700&q=80" alt="Cyber Backpack">
+                </div>
+                <div class="product-info">
+                    <h3>Cyber Backpack</h3>
+                    <p>Tas dengan desain futuristik dan strip LED yang dapat disesuaikan.</p>
+                    <span class="product-price">Rp 759.000</span>
+                    <a href="#telegram" class="btn btn-telegram">Beli via Telegram</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Telegram Section -->
+    <section class="telegram" id="telegram">
+        <h2 class="section-title">Hubungi via Telegram</h2>
+        <div class="telegram-container">
+            <div class="telegram-info">
+                <h3>Terhubung dengan Saya melalui Telegram</h3>
+                <p>Untuk informasi produk, pemesanan, atau sekadar berbagi minat dalam fashion cyber, jangan ragu untuk menghubungi saya melalui Telegram.</p>
+            </div>
+            
+            <div class="telegram-cards">
+                <div class="telegram-card">
+                    <i class="fab fa-telegram"></i>
+                    <h4>Telegram Channel</h4>
+                    <p>Bergabunglah dengan channel Telegram saya untuk update terbaru tentang produk dan koleksi terbaru.</p>
+                    <a href="https://t.me/cybergirl_channel" class="btn btn-telegram">Join Channel</a>
+                </div>
+                
+                <div class="telegram-card">
+                    <i class="fab fa-telegram"></i>
+                    <h4>Telegram Chat</h4>
+                    <p>Hubungi saya langsung melalui chat Telegram untuk pertanyaan atau pemesanan produk.</p>
+                    <a href="https://t.me/cybergirl_admin" class="btn btn-telegram">Chat Sekarang</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 CyberViolet. All rights reserved. Designed with <i class="fas fa-heart" style="color: var(--neon-pink);"></i></p>
+        <p>Hubungi saya melalui: <a href="https://t.me/cybergirl_channel">Telegram Channel</a> | <a href="https://t.me/cybergirl_admin">Telegram Chat</a></p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add scroll animation to elements
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const elementsToAnimate = document.querySelectorAll('.product-card, .telegram-card, .about-img, .about-text');
+            elementsToAnimate.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
