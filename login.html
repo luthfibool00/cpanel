@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NexusHub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body><div class="auth-container">
+    <div class="auth-box">
+        <h1>🚀 NexusHub</h1>
+        <h2>Login Akun</h2>    <form id="loginForm">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Email kamu" required>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Password" required>
+        </div>
+
+        <p id="message" class="message"></p>
+
+        <button type="submit" class="btn-submit">
+            Masuk
+        </button>
+    </form>
+
+    <p class="switch">
+        Belum punya akun?
+        <a href="register.html">Daftar di sini</a>
+    </p>
+</div>
+
+</div><script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
+
+    /*
+      SEMENTARA:
+      Ini hanya contoh frontend.
+      Nanti bagian ini kita sambungkan ke API/database.
+    */
+
+    if (email && password) {
+        localStorage.setItem("currentUser", email);
+
+        message.style.color = "green";
+        message.textContent = "Login berhasil!";
+
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 500);
+    }
+});
+</script></body>
+</html>
