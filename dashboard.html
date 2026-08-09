@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Dashboard</title>
+    <style>
+        /* --- Tema & Layout --- */
+        :root {
+            --primary: #4f46e5; --primary-hover: #4338ca;
+            --bg-body: #f3f4f6; --bg-surface: #ffffff;
+            --text-main: #111827; --text-muted: #6b7280;
+            --border-color: #e5e7eb; --sidebar-width: 250px;
+        }
+        [data-theme="dark"] {
+            --primary: #6366f1; --primary-hover: #818cf8;
+            --bg-body: #111827; --bg-surface: #1f2937;
+            --text-main: #f9fafb; --text-muted: #9ca3af;
+            --border-color: #374151;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar { width: var(--sidebar-width); background-color: var(--bg-surface); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; z-index: 100; }
+        .brand { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 2rem; display: flex; justify-content: space-between; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+        .nav-item { padding: 0.75rem 1rem; border-radius: 0.5rem; cursor: pointer; color: var(--text-muted); font-weight: 500; display: flex; gap: 0.75rem; }
+        .nav-item:hover { background-color: var(--bg-body); color: var(--text-main); }
+        .nav-item.active { background-color: var(--primary); color: white; }
+        
+        .bottom-actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+        .btn-theme, .btn-login, .btn-logout { width: 100%; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; border: 1px solid var(--border-color); background-color: var(--bg-body); color: var(--text-main); }
+        .btn-login { background-color: var(--primary); color: white; border: none; }
+        .btn-logout { background-color: #ef4444; color: white; border: none; display: none; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .header { background-color: var(--bg-surface); padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; }
+        .menu-toggle { display: none; font-size: 1.5rem; background: none; border: none; color: var(--text-main); cursor: pointer; margin-right: 1rem; }
+        .user-profile { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 35px; height: 35px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; display: none; }
+        
+        .content-area { padding: 2rem; }
+        .section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .card { background-color: var(--bg-surface); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        /* --- Modal Auth --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200; }
+        .modal-overlay.active { display: flex; }
+        .auth-box { background: var(--bg-surface); padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; position: relative; }
+        .close-modal { position: absolute; top: 1rem; right: 1.5rem; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+        .auth-box h2 { text-align: center; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: var(--bg-body); color: var(--text-main); }
+        .btn-submit { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .switch-auth { text-align: center; margin-top: 1rem; font-size: 0.875rem; cursor: pointer; color: var(--primary); }
+        
+        .alert-msg { font-size: 0.85rem; color: #ef4444; text-align: center; margin-top: 0.5rem; display: none; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -100%; height: 100vh; transition: left 0.3s; }
+            .sidebar.show { left: 0; }
+            .menu-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal Auth (Login/Register) -->
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-box">
+            <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+            <h2 id="authTitle">Login Akun</h2>
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <!-- Email default sudah diisi otomatis di sini -->
+                    <input type="email" id="emailInput" required value="luthfi@admin.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <!-- Password default sudah diisi otomatis di sini -->
+                    <input type="password" id="passwordInput" required value="admin123">
+                </div>
+                <div class="alert-msg" id="alertMsg"></div>
+                <button type="submit" class="btn-submit" id="authSubmitBtn">Masuk</button>
+            </form>
+            <div class="switch-auth" onclick="toggleAuthMode()" id="switchAuthText">Belum punya akun? Daftar di sini</div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand"><span>🚀 NexusHub</span></div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</li>
+            <li class="nav-item" onclick="showSection('ai-tools', this)">🤖 AI Tools</li>
+            <li class="nav-item" onclick="showSection('games', this)">🎮 Game Center</li>
+        </ul>
+        <div class="bottom-actions">
+            <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 Mode Gelap</button>
+            <button class="btn-login" id="btnLogin" onclick="toggleModal(true)">🔑 Login Akun</button>
+            <button class="btn-logout" id="btnLogout" onclick="handleLogout()">🚪 Keluar</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h2 id="header-title">Dashboard Overview</h2>
+            <div class="user-profile">
+                <span id="userEmailText" style="font-size: 0.9rem; color: var(--text-muted); display: none;"></span>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <h3 id="welcomeMessage">Silakan login untuk mengakses fitur penuh.</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Status Akun</h3>
+                        <h2 id="statusTeks" style="color: var(--primary);">Tamu</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Tools Section -->
+            <div id="ai-tools" class="section">
+                <h3>Fitur AI</h3>
+                <p>Bagian ini siap untuk ditambahkan alat kecerdasan buatan.</p>
+            </div>
+            
+            <!-- Games Section -->
+            <div id="games" class="section">
+                <h3>Game Center</h3>
+                <p>Bagian ini siap untuk diisi dengan mini game interaktif.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* --- Navigasi & Tema (UI) --- */
+        function showSection(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            
+            const titleMap = { 'dashboard': 'Dashboard Overview', 'ai-tools': 'Koleksi AI Tools', 'games': 'Game Center' };
+            document.getElementById('header-title').innerText = titleMap[id];
+        }
+        
+        function toggleTheme() {
+            const body = document.documentElement;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme'); localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        /* --- Logika Autentikasi (Local Storage) --- */
+        let isLoginMode = true;
+
+        function toggleModal(show) {
+            document.getElementById('authModal').style.display = show ? 'flex' : 'none';
+            document.getElementById('alertMsg').style.display = 'none';
+            
+            // Jika mode login ditutup lalu dibuka lagi, pastikan nilai default tetap ada
+            if(show && isLoginMode) {
+                document.getElementById('emailInput').value = "luthfi@admin.com";
+                document.getElementById('passwordInput').value = "admin123";
+            }
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? "Login Akun" : "Daftar Akun Baru";
+            document.getElementById('authSubmitBtn').innerText = isLoginMode ? "Masuk" : "Daftar Sekarang";
+            document.getElementById('switchAuthText').innerText = isLoginMode ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Login di sini";
+            document.getElementById('alertMsg').style.display = 'none';
+            
+            // Bersihkan form jika mau daftar baru, isi kembali jika kembali ke login
+            if (!isLoginMode) {
+                document.getElementById('authForm').reset();
+            } else {
+                document.getElementById('emailInput').value = "luthfi@admin.com";
+                document.getElementById('passwordInput').value = "admin123";
+            }
+        }
+
+        function showAlert(msg) {
+            const alertBox = document.getElementById('alertMsg');
+            alertBox.innerText = msg;
+            alertBox.style.display = 'block';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+
+            if (password.length < 6) {
+                showAlert("Password minimal 6 karakter!");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('usersDB')) || {};
+
+            if (isLoginMode) {
+                if (users[email] && users[email].password === password) {
+                    localStorage.setItem('currentUser', email);
+                    toggleModal(false);
+                    updateUI();
+                } else {
+                    showAlert("Email atau password salah!");
+                }
+            } else {
+                if (users[email]) {
+                    showAlert("Email ini sudah terdaftar! Silakan login.");
+                } else {
+                    users[email] = { password: password };
+                    localStorage.setItem('usersDB', JSON.stringify(users));
+                    localStorage.setItem('currentUser', email);
+                    alert("Akun berhasil dibuat!");
+                    toggleModal(false);
+                    updateUI();
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            updateUI();
+        }
+
+        function updateUI() {
+            const currentUser = localStorage.getItem('currentUser');
+            
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLogout = document.getElementById('btnLogout');
+            const welcomeMsg = document.getElementById('welcomeMessage');
+            const statusTeks = document.getElementById('statusTeks');
+            const userAvatar = document.getElementById('userAvatar');
+            const userEmailText = document.getElementById('userEmailText');
+
+            if (currentUser) {
+                btnLogin.style.display = 'none';
+                btnLogout.style.display = 'block';
+                userAvatar.style.display = 'flex';
+                userEmailText.style.display = 'block';
+                
+                userEmailText.innerText = currentUser;
+                userAvatar.innerText = currentUser.charAt(0).toUpperCase();
+                welcomeMsg.innerText = `Halo, ${currentUser}! Selamat datang kembali.`;
+                statusTeks.innerText = "Member VIP";
+            } else {
+                btnLogin.style.display = 'block';
+                btnLogout.style.display = 'none';
+                userAvatar.style.display = 'none';
+                userEmailText.style.display = 'none';
+
+                welcomeMsg.innerText = "Silakan login untuk mengakses fitur penuh.";
+                statusTeks.innerText = "Tamu";
+            }
+        }
+
+        // --- SCRIPT AWAL SAAT HALAMAN DIMUAT ---
+        window.onload = () => {
+            if (localStorage.getItem('theme') === 'dark') toggleTheme();
+            
+            // Buat akun default secara otomatis ke dalam database lokal jika belum ada
+            let users = JSON.parse(localStorage.getItem('usersDB')) || {};
+            if (!users['luthfi@admin.com']) {
+                users['luthfi@admin.com'] = { password: 'admin123' };
+                localStorage.setItem('usersDB', JSON.stringify(users));
+            }
+
+            updateUI(); 
+        };
+    </script>
+</body>
+</html>
