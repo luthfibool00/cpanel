@@ -50,7 +50,7 @@
         .card { background-color: var(--bg-surface); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
         /* --- Modal Auth --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 200; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
         .modal-overlay.active { display: flex; }
         .auth-box { background: var(--bg-surface); padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; position: relative; }
         .close-modal { position: absolute; top: 1rem; right: 1.5rem; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
@@ -58,7 +58,7 @@
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; }
         .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: var(--bg-body); color: var(--text-main); }
-        .btn-submit { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .btn-submit { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; font-weight: bold; cursor: pointer; margin-top: 1rem; position: relative; z-index: 10; }
         .switch-auth { text-align: center; margin-top: 1rem; font-size: 0.875rem; cursor: pointer; color: var(--primary); }
         .alert-msg { font-size: 0.85rem; color: #ef4444; text-align: center; margin-top: 0.5rem; display: none; }
 
@@ -67,6 +67,312 @@
         .ai-textarea:focus { outline: 2px solid var(--primary); }
         .ai-result { margin-top: 1.5rem; padding: 1rem; background: var(--bg-body); border-radius: 0.5rem; border: 1px solid var(--border-color); display: none; line-height: 1.6; }
 
+        /* --- Game CSS (Tic-Tac-Toe) --- */
+        .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 250px; margin: 1.5rem auto; }
+        .cell { aspect-ratio: 1; background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .cell:hover { background: var(--border-color); }
+        .cell.x { color: var(--primary); }
+        .cell.o { color: #ef4444; }
+
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -100%; height: 100vh; transition: left 0.3s; }
+            .sidebar.show { left: 0; }
+            .menu-toggle { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal Auth (Login/Register) -->
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-box">
+            <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+            <h2 id="authTitle">Login Akun</h2>
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="emailInput" required value="luthfi@admin.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="passwordInput" required value="admin123">
+                </div>
+                <div class="alert-msg" id="alertMsg"></div>
+                <button type="submit" class="btn-submit" id="authSubmitBtn">Masuk</button>
+            </form>
+            <div class="switch-auth" onclick="toggleAuthMode()" id="switchAuthText">Belum punya akun? Daftar di sini</div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <span>🚀 NexusHub</span>
+            <button class="menu-toggle" style="display: none; border:none; background:none; font-size:1.5rem; color:inherit;" onclick="toggleSidebar()">&times;</button>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</li>
+            <li class="nav-item" onclick="showSection('ai-tools', this)">🤖 AI Tools</li>
+            <li class="nav-item" onclick="showSection('games', this)">🎮 Game Center</li>
+        </ul>
+        <div class="bottom-actions">
+            <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 Mode Gelap</button>
+            <button class="btn-login" id="btnLogin" onclick="toggleModal(true)">🔑 Login Akun</button>
+            <button class="btn-logout" id="btnLogout" onclick="handleLogout()">🚪 Keluar</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h2 id="header-title">Dashboard Overview</h2>
+            <div class="user-profile">
+                <span id="userEmailText" style="font-size: 0.9rem; color: var(--text-muted); display: none;"></span>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <h3 id="welcomeMessage">Silakan login untuk mengakses fitur penuh.</h3>
+                <!-- Tombol login tambahan -->
+                <button id="btnDashboardLogin" class="btn-submit" style="width: auto; padding: 0.5rem 1.5rem; margin-top: 1rem; margin-bottom: 1.5rem; display: inline-block;">🔑 Login Sekarang</button>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Status Akun</h3>
+                        <h2 id="statusTeks" style="color: var(--primary);">Tamu</h2>
+                    </div>
+                    <div class="card">
+                        <h3>Aktivitas AI</h3>
+                        <h2 style="color: var(--primary);">0</h2>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Prompt diproses</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Tools Section -->
+            <div id="ai-tools" class="section">
+                <div class="card">
+                    <h3>🤖 Asisten AI Penulis</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">Ketik perintah apa saja (misal: "Buatkan saya puisi pendek" atau "Ringkas teks ini").</p>
+                    <textarea class="ai-textarea" id="aiInput" placeholder="Ketik prompt di sini..."></textarea>
+                    <button class="btn-submit" style="width: auto; padding: 0.75rem 2rem;" onclick="generateAI()">Kirim ke AI ✨</button>
+                    
+                    <div class="ai-result" id="aiOutput"></div>
+                </div>
+            </div>
+            
+            <!-- Games Section -->
+            <div id="games" class="section">
+                <div class="card" style="text-align: center;">
+                    <h3>🎮 Tic-Tac-Toe Klasik</h3>
+                    <p id="gameStatus" style="color: var(--text-muted); margin-top: 0.5rem;">Giliran pemain: <strong>X</strong></p>
+                    
+                    <div class="board" id="tictactoeBoard">
+                        <div class="cell" onclick="makeMove(this, 0)"></div>
+                        <div class="cell" onclick="makeMove(this, 1)"></div>
+                        <div class="cell" onclick="makeMove(this, 2)"></div>
+                        <div class="cell" onclick="makeMove(this, 3)"></div>
+                        <div class="cell" onclick="makeMove(this, 4)"></div>
+                        <div class="cell" onclick="makeMove(this, 5)"></div>
+                        <div class="cell" onclick="makeMove(this, 6)"></div>
+                        <div class="cell" onclick="makeMove(this, 7)"></div>
+                        <div class="cell" onclick="makeMove(this, 8)"></div>
+                    </div>
+                    
+                    <button class="btn-submit" style="width: auto; padding: 0.5rem 2rem; background: var(--text-muted);" onclick="resetGame()">Mulai Ulang</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* --- Navigasi, Responsive & Tema --- */
+        function showSection(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            const titleMap = { 'dashboard': 'Dashboard Overview', 'ai-tools': 'Koleksi AI Tools', 'games': 'Game Center' };
+            document.getElementById('header-title').innerText = titleMap[id];
+            
+            if(window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+        
+        function toggleTheme() {
+            const body = document.documentElement;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme'); localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        /* --- Logika AI Tools --- */
+        function generateAI() {
+            const input = document.getElementById('aiInput').value;
+            const output = document.getElementById('aiOutput');
+            
+            if(!input.trim()) {
+                alert("Mohon ketik sesuatu terlebih dahulu!");
+                return;
+            }
+
+            output.style.display = 'block';
+            output.innerHTML = '<span style="color: var(--text-muted);">Sedang berpikir... ⏳</span>';
+            
+            setTimeout(() => {
+                output.innerHTML = `<strong>Jawaban AI:</strong><br><br>Ini adalah simulasi jawaban untuk perintah: <em>"${input}"</em>.<br><br>Sistem AI sudah siap dihubungkan dengan API yang sebenarnya!`;
+            }, 1500); 
+        }
+
+        /* --- Logika Game Tic-Tac-Toe --- */
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let gameActive = true;
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]            
+        ];
+
+        function makeMove(cell, index) {
+            if (board[index] !== "" || !gameActive) return;
+            board[index] = currentPlayer;
+            cell.innerText = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+            checkWinner();
+        }
+
+        function checkWinner() {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                document.getElementById('gameStatus').innerHTML = `🎉 Pemain <strong>${currentPlayer}</strong> Menang!`;
+                gameActive = false;
+                return;
+            }
+
+            if (!board.includes("")) {
+                document.getElementById('gameStatus').innerHTML = "🤝 Permainan Seri!";
+                gameActive = false;
+                return;
+            }
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+            document.getElementById('gameStatus').innerHTML = `Giliran pemain: <strong>${currentPlayer}</strong>`;
+        }
+
+        function resetGame() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "X";
+            gameActive = true;
+            document.getElementById('gameStatus').innerHTML = `Giliran pemain: <strong>${currentPlayer}</strong>`;
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove('x', 'o');
+            });
+        }
+
+        /* --- Logika Autentikasi (Sistem Login) --- */
+        let isLoginMode = true;
+
+        function toggleModal(show) {
+            document.getElementById('authModal').style.display = show ? 'flex' : 'none';
+            document.getElementById('alertMsg').style.display = 'none';
+            if(show && isLoginMode) {
+                document.getElementById('emailInput').value = "luthfi@admin.com";
+                document.getElementById('passwordInput').value = "admin123";
+            }
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? "Login Akun" : "Daftar Akun Baru";
+            document.getElementById('authSubmitBtn').innerText = isLoginMode ? "Masuk" : "Daftar Sekarang";
+            document.getElementById('switchAuthText').innerText = isLoginMode ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Login di sini";
+            document.getElementById('alertMsg').style.display = 'none';
+            if (!isLoginMode) {
+                document.getElementById('authForm').reset();
+            } else {
+                document.getElementById('emailInput').value = "luthfi@admin.com";
+                document.getElementById('passwordInput').value = "admin123";
+            }
+        }
+
+        function showAlert(msg) {
+            const alertBox = document.getElementById('alertMsg');
+            alertBox.innerText = msg;
+            alertBox.style.display = 'block';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            if (password.length < 6) { showAlert("Password minimal 6 karakter!"); return; }
+
+            let users = JSON.parse(localStorage.getItem('usersDB')) || {};
+
+            if (isLoginMode) {
+                if (users[email] && users[email].password === password) {
+                    localStorage.setItem('currentUser', email);
+                    toggleModal(false);
+                    updateUI();
+                } else if (email === "luthfi@admin.com" && password === "admin123") {
+                    localStorage.setItem('currentUser', email);
+                    toggleModal(false);
+                    updateUI();
+                } else {
+                    showAlert("Email atau password salah!");
+                }
+            } else {
+                if (users[email] || email === "luthfi@admin.com") {
+                    showAlert("Email ini sudah terdaftar! Silakan login.");
+                } else {
+                    users[email] = { password: password };
+                    localStorage.setItem('usersDB', JSON.stringify(users));
+                    localStorage.setItem('currentUser', email);
+                    alert("Akun berhasil dibuat!");
+                    toggleModal(false);
+                    updateUI();
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+        }
+
+        function updateUI() {
+            const currentUser = localStorage.getItem('currentUser');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLogout = document.getElementById('btnLogout');
+            const welcomeMsg = document.getElementById('welcomeMessage');
+            const statusTeks = document.getElementById('statusTeks');
+            const userAvatar = document.getElementById('userAvatar');
+            const userEmailText = document.getElementById('userEmailText');
+            const btnDashboardLogin = document.getElementById('btnDashboardLogin');
+
+            if (currentUser) {
+                if(btnLogin) btnLogin.style.display = 'none';
+                if(btnLogo
         /* --- Game CSS (Tic-Tac-Toe) --- */
         .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 250px; margin: 1.5rem auto; }
         .cell { aspect-ratio: 1; background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
