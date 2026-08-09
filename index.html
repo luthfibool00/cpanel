@@ -1,72 +1,370 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusHub Dashboard</title><link rel="stylesheet" href="style.css">
+    <title>NexusHub Dashboard</title>
 
-<style>
-    :root {
-        --primary: #4f46e5;
-        --primary-hover: #4338ca;
-        --bg-body: #f3f4f6;
-        --bg-surface: #ffffff;
-        --text-main: #111827;
-        --text-muted: #6b7280;
-        --border-color: #e5e7eb;
-        --sidebar-width: 250px;
-    }
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
 
-    [data-theme="dark"] {
-        --primary: #6366f1;
-        --primary-hover: #818cf8;
-        --bg-body: #111827;
-        --bg-surface: #1f2937;
-        --text-main: #f9fafb;
-        --text-muted: #9ca3af;
-        --border-color: #374151;
-    }
+<body>
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", sans-serif;
-    }
+    <!-- LOGIN MODAL -->
+    <div class="modal-overlay active" id="authModal">
+        <div class="auth-box">
 
-    body {
-        background: var(--bg-body);
-        color: var(--text-main);
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-    }
+            <span class="close-modal" onclick="forceCloseModal()">
+                &times;
+            </span>
 
-    .sidebar {
-        width: var(--sidebar-width);
-        background: var(--bg-surface);
-        border-right: 1px solid var(--border-color);
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        z-index: 100;
-    }
+            <h2 id="authTitle">Login Akun</h2>
 
-    .brand {
-        font-size: 22px;
-        font-weight: bold;
-        color: var(--primary);
-        margin-bottom: 30px;
-    }
+            <form id="authForm" onsubmit="handleAuth(event)">
 
-    .nav-menu {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        flex: 1;
-    }
+                <div class="form-group">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        id="emailInput"
+                        required
+                        placeholder="Masukkan email"
+                    >
+                </div>
 
-    .nav-item {
+                <div class="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        id="passwordInput"
+                        required
+                        placeholder="Masukkan password"
+                    >
+                </div>
+
+                <div class="alert-msg" id="alertMsg"></div>
+
+                <button
+                    type="submit"
+                    class="btn-submit"
+                    id="authSubmitBtn"
+                >
+                    Masuk
+                </button>
+
+            </form>
+
+            <div
+                class="switch-auth"
+                onclick="toggleAuthMode()"
+                id="switchAuthText"
+            >
+                Belum punya akun? Daftar di sini
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <span>🚀 NexusHub</span>
+
+            <button
+                class="menu-toggle"
+                onclick="toggleSidebar()"
+            >
+                &times;
+            </button>
+        </div>
+
+
+        <ul class="nav-menu">
+
+            <li
+                class="nav-item active"
+                onclick="showSection('dashboard', this)"
+            >
+                📊 Dashboard
+            </li>
+
+            <li
+                class="nav-item"
+                onclick="showSection('ai-tools', this)"
+            >
+                🤖 AI Tools
+            </li>
+
+            <li
+                class="nav-item"
+                onclick="showSection('games', this)"
+            >
+                🎮 Game Center
+            </li>
+
+        </ul>
+
+
+        <div class="bottom-actions">
+
+            <button
+                class="btn-theme"
+                onclick="toggleTheme()"
+                id="themeBtn"
+            >
+                🌙 Mode Gelap
+            </button>
+
+            <button
+                class="btn-login"
+                id="btnLogin"
+                onclick="openModal()"
+            >
+                🔑 Login Akun
+            </button>
+
+            <button
+                class="btn-logout"
+                id="btnLogout"
+                onclick="handleLogout()"
+            >
+                🚪 Keluar
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <button
+                class="menu-toggle"
+                onclick="toggleSidebar()"
+            >
+                ☰
+            </button>
+
+            <h2 id="header-title">
+                Dashboard Overview
+            </h2>
+
+            <div class="user-profile">
+
+                <span
+                    id="userEmailText"
+                    class="user-email"
+                ></span>
+
+                <div
+                    class="user-avatar"
+                    id="userAvatar"
+                >
+                    U
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <div class="content-area">
+
+
+            <!-- DASHBOARD -->
+            <section
+                id="dashboard"
+                class="section active"
+            >
+
+                <h3 id="welcomeMessage">
+                    Silakan login untuk mengakses fitur penuh.
+                </h3>
+
+                <button
+                    id="btnDashboardLogin"
+                    class="btn-submit dashboard-login"
+                    onclick="openModal()"
+                >
+                    🔑 Login Sekarang
+                </button>
+
+
+                <div class="grid">
+
+                    <div class="card">
+
+                        <h3>Status Akun</h3>
+
+                        <h2
+                            id="statusTeks"
+                            class="primary-text"
+                        >
+                            Tamu
+                        </h2>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Aktivitas AI</h3>
+
+                        <h2 class="primary-text">
+                            0
+                        </h2>
+
+                        <p class="muted">
+                            Prompt diproses
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- AI TOOLS -->
+            <section
+                id="ai-tools"
+                class="section"
+            >
+
+                <div class="card">
+
+                    <h3>🤖 Asisten AI Penulis</h3>
+
+                    <p class="muted ai-description">
+                        Ketik perintah apa saja.
+                    </p>
+
+                    <textarea
+                        class="ai-textarea"
+                        id="aiInput"
+                        placeholder="Ketik prompt di sini..."
+                    ></textarea>
+
+                    <button
+                        class="btn-submit ai-button"
+                        onclick="generateAI()"
+                    >
+                        Kirim ke AI ✨
+                    </button>
+
+                    <div
+                        class="ai-result"
+                        id="aiOutput"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- GAME -->
+            <section
+                id="games"
+                class="section"
+            >
+
+                <div
+                    class="card game-card"
+                >
+
+                    <h3>🎮 Tic-Tac-Toe Klasik</h3>
+
+                    <p
+                        id="gameStatus"
+                        class="muted game-status"
+                    >
+                        Giliran pemain:
+                        <strong>X</strong>
+                    </p>
+
+
+                    <div
+                        class="board"
+                        id="tictactoeBoard"
+                    >
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 0)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 1)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 2)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 3)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 4)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 5)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 6)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 7)"
+                        ></div>
+
+                        <div
+                            class="cell"
+                            onclick="makeMove(this, 8)"
+                        ></div>
+
+                    </div>
+
+
+                    <button
+                        class="btn-submit reset-button"
+                        onclick="resetGame()"
+                    >
+                        Mulai Ulang
+                    </button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+    <script src="script.js"></script>
+
+</body>
+</html>    .nav-item {
         padding: 12px 15px;
         border-radius: 8px;
         cursor: pointer;
