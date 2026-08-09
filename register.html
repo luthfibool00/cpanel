@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - NexusHub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body><div class="auth-container">
+    <div class="auth-box">
+        <h1>🚀 NexusHub</h1>
+        <h2>Daftar Akun</h2>    <form id="registerForm">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Email kamu" required>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Minimal 6 karakter" required>
+        </div>
+
+        <div class="form-group">
+            <label>Konfirmasi Password</label>
+            <input type="password" id="confirmPassword" placeholder="Ulangi password" required>
+        </div>
+
+        <p id="message" class="message"></p>
+
+        <button type="submit" class="btn-submit">
+            Daftar
+        </button>
+    </form>
+
+    <p class="switch">
+        Sudah punya akun?
+        <a href="login.html">Login di sini</a>
+    </p>
+</div>
+
+</div><script>
+document.getElementById("registerForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const message = document.getElementById("message");
+
+    if (password.length < 6) {
+        message.textContent = "Password minimal 6 karakter!";
+        message.style.color = "red";
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        message.textContent = "Konfirmasi password tidak cocok!";
+        message.style.color = "red";
+        return;
+    }
+
+    /*
+      SEMENTARA:
+      Nanti bagian ini kita sambungkan ke API/database.
+    */
+
+    message.textContent = "Pendaftaran berhasil!";
+    message.style.color = "green";
+
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 700);
+});
+</script></body>
+</html>
